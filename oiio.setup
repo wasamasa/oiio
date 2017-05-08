@@ -1,0 +1,7 @@
+(compile -s -c++ -O3 -d1 "oiio.scm" -J -lOpenImageIO -C -Wno-write-strings -C -std=c++11)
+(compile -s "oiio.import.scm")
+
+(install-extension
+ 'oiio
+ '("oiio.so" "oiio.import.so")
+ '((version "0.0.1")))
