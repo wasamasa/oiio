@@ -103,7 +103,7 @@ OIIO_NAMESPACE_USING
   (let ((imageinput* (ImageInput::open filename)))
     (if imageinput*
         (set-finalizer! (make-imageinput imageinput*) imageinput-destroy)
-        (abort (oiio-error (geterror) 'imageinput-create)))))
+        (abort (oiio-error (geterror) 'imageinput-open)))))
 
 (define (imageinput-destroy imageinput)
   (and-let* ((imageinput* (imageinput-pointer imageinput)))
