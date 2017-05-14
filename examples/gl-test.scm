@@ -55,10 +55,15 @@
          (pixels (make-blob size)))
     (imageinput-read-image in 'uint8 pixels)
     (imageinput-close in)
-    (values width height pixels)))
+    (values width height channels pixels)))
 
-(define-values (image-width image-height image-pixels)
+(define-values (image-width image-height image-channels image-pixels)
   (load-image "texture.jpg"))
+
+(define image-format
+  (cond
+   ((= image-channels 3) gl:+rgb+)
+   ((= image-channels 4) gl:+rgba+)))
 
 (define image (make-locative image-pixels))
 
@@ -83,7 +88,7 @@
       (gl:bind-vertex-array (glu:mesh-vao mesh))
       (gl:bind-texture gl:+texture-2d+ texture)
       (gl:tex-image-2d gl:+texture-2d+ 0 gl:+rgb+ image-width image-height 0
-                       gl:+rgb+ gl:+unsigned-byte+ image)
+                       image-format gl:+unsigned-byte+ image)
       (gl:tex-parameteri gl:+texture-2d+ gl:+texture-wrap-s+ gl:+clamp-to-edge+)
       (gl:tex-parameteri gl:+texture-2d+ gl:+texture-wrap-t+ gl:+clamp-to-edge+)
       (gl:tex-parameteri gl:+texture-2d+ gl:+texture-min-filter+ gl:+linear+)
