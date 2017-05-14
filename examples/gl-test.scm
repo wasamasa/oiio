@@ -87,6 +87,7 @@
                                                program "texcoord"))))
       (gl:bind-vertex-array (glu:mesh-vao mesh))
       (gl:bind-texture gl:+texture-2d+ texture)
+      (gl:pixel-storei gl:+unpack-alignment+ 1)
       (gl:tex-image-2d gl:+texture-2d+ 0 gl:+rgb+ image-width image-height 0
                        image-format gl:+unsigned-byte+ image)
       (gl:tex-parameteri gl:+texture-2d+ gl:+texture-wrap-s+ gl:+clamp-to-edge+)
