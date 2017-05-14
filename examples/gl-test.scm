@@ -61,9 +61,9 @@
   (load-image "texture.jpg"))
 
 (define image-format
-  (cond
-   ((= image-channels 3) gl:+rgb+)
-   ((= image-channels 4) gl:+rgba+)))
+  (case image-channels
+    ((3) gl:+rgb+)
+    ((4) gl:+rgba+)))
 
 (define image (make-locative image-pixels))
 
