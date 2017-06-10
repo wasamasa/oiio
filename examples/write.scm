@@ -1,10 +1,10 @@
-(use oiio)
+(use oiio srfi-4)
 
 (define filename "foo.jpg")
 (define width 640)
 (define height 480)
 (define channels 3)
-(define pixels (make-blob (* width height channels)))
+(define pixels (u8vector->blob (make-u8vector (* width height channels) 0)))
 
 (define out (imageoutput-create filename))
 (define spec (imagespec-create width height channels 'uint8))
