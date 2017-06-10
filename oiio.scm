@@ -8,7 +8,7 @@
    openimageio-version)
 
 (import chicken scheme foreign)
-(use lolevel coops)
+(use lolevel)
 
 ;;; headers
 
@@ -47,18 +47,26 @@ OIIO_NAMESPACE_USING
 (define-foreign-type ImageInput* (nonnull-c-pointer (struct "ImageInput")))
 (define-foreign-type nullable-ImageOutput* (c-pointer (struct "ImageOutput")))
 (define-foreign-type ImageOutput* (nonnull-c-pointer (struct "ImageOutput")))
-(define-foreign-type ImageSpec& (instance-ref "ImageSpec" <imagespec>))
-(define-foreign-type ImageSpec (instance "ImageSpec" <imagespec>))
+(define-foreign-type ImageSpec& (instance-ref "ImageSpec" 'imagespec))
+(define-foreign-type ImageSpec (instance "ImageSpec" 'imagespec))
 
 ;;; auxiliary records
 
 (define-record imageinput pointer)
 (define-record imageoutput pointer)
+(define-record imagespec pointer)
 
 ;;; class helpers
 
-(define-class <imagespec> ()
-  ((this #f)))
+(define (make type _slot pointer)
+  (case type
+    ((imagespec) (make-imagespec pointer))
+    (else (error "Unknown C++ type"))))
+
+(define (slot-ref thing _slot)
+  (cond
+   ((imagespec? thing) (imagespec-pointer thing))
+   (else (error "Unknown C++ type"))))
 
 ;;; foreign functions
 
@@ -140,7 +148,7 @@ OIIO_NAMESPACE_USING
 
 (define (imageoutput-open imageoutput filename imagespec)
   (and-let* ((imageoutput* (imageoutput-pointer imageoutput))
-             ((slot-ref imagespec 'this)))
+             ((imagespec-pointer imagespec)))
     (when (not (ImageOutput->open imageoutput* filename imagespec))
       (abort (oiio-error (ImageOutput->geterror imageoutput*)
                          'imageoutput-open)))))
@@ -164,20 +172,20 @@ OIIO_NAMESPACE_USING
                     imagespec-destroy)))
 
 (define (imagespec-destroy imagespec)
-  (when (slot-ref imagespec 'this)
+  (when (imagespec-pointer imagespec)
     (ImageSpec::destroy imagespec)
-    (set! (slot-ref imagespec 'this) #f)))
+    (imagespec-pointer-set! imagespec #f)))
 
 (define (imagespec-width imagespec)
-  (when (slot-ref imagespec 'this)
+  (when (imagespec-pointer imagespec)
     (ImageSpec.width imagespec)))
 
 (define (imagespec-height imagespec)
-  (when (slot-ref imagespec 'this)
+  (when (imagespec-pointer imagespec)
     (ImageSpec.height imagespec)))
 
 (define (imagespec-nchannels imagespec)
-  (when (slot-ref imagespec 'this)
+  (when (imagespec-pointer imagespec)
     (ImageSpec.nchannels imagespec)))
 
 (define (openimageio-version)
