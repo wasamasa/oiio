@@ -1,4 +1,7 @@
-(use oiio)
+(import scheme)
+(import (chicken base))
+(import (chicken blob))
+(import oiio)
 
 (define filename "foo.jpg")
 (define in (imageinput-open filename))

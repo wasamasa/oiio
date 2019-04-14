@@ -1,7 +1,13 @@
-(use lolevel srfi-4 srfi-18 oiio
-     (prefix opengl-glew gl:)
-     (prefix glfw3 glfw:)
-     (prefix gl-utils glu:))
+(import scheme)
+(import (chicken base))
+(import (chicken blob))
+(import (chicken locative))
+(import (prefix epoxy gl:))
+(import (prefix glfw3 glfw:))
+(import (prefix gl-utils glu:))
+(import (srfi 4))
+(import (srfi 18))
+(import oiio)
 
 (define width 500)
 (define height 500)
@@ -75,7 +81,6 @@
                            opengl-forward-compat: #t
                            opengl-profile: glfw:+opengl-core-profile+)
     (glfw:make-context-current (glfw:window))
-    (gl:init)
     (let* ((texture (glu:gen-texture))
            (vertex-shader (glu:make-shader gl:+vertex-shader+ vertex-shader-source))
            (fragment-shader (glu:make-shader gl:+fragment-shader+ fragment-shader-source))

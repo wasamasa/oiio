@@ -1,0 +1,11 @@
+((synopsis "Bindings to OpenImageIO")
+ (author "Vasilij Schneidermann")
+ (license "BSD-3")
+ (category graphics)
+ (foreign-dependencies "OpenImageIO")
+ (components (extension oiio
+                        (csc-options "-O3" "-d1" "-c++"
+                                     "-C" "-Wno-write-strings"
+                                     "-C" "-std=c++11"
+                                     "-L" "-lOpenImageIO")
+                        (source-dependencies "oiio-impl.scm"))))

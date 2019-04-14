@@ -1,5 +1,0 @@
-((synopsis "Bindings to OpenImageIO")
- (author "Vasilij Schneidermann")
- (license "BSD")
- (category graphics)
- (foreign-depends "OpenImageIO"))

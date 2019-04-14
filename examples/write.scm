@@ -1,4 +1,7 @@
-(use oiio srfi-4)
+(import scheme)
+(import (chicken base))
+(import (srfi 4))
+(import oiio)
 
 (define filename "foo.jpg")
 (define width 640)
