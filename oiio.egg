@@ -3,6 +3,7 @@
  (license "BSD-3")
  (category graphics)
  (foreign-dependencies "OpenImageIO>=2.0")
+ (dependencies bind)
  (components (extension oiio
                         (csc-options "-O3" "-d1" "-c++"
                                      "-C" "-Wno-write-strings"

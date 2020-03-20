@@ -1,36 +1,37 @@
-#include <OpenImageIO/imageio.h>
-OIIO_NAMESPACE_USING
+int oiio_version() {
+    return openimageio_version();
+}
 
 char* oiio_geterror() {
     return strdup(geterror().c_str());
 }
 
-ImageSpec* oiio_ImageSpec_create(int width, int height, int channels, int type) {
+ImageSpec* oiio_ImageSpec___create(int width, int height, int channels, int type) {
     return new ImageSpec(width, height, channels, TypeDesc::BASETYPE(type));
 }
 
-void oiio_ImageSpec_destroy(ImageSpec *spec) {
+void oiio_ImageSpec___destroy(ImageSpec *spec) {
     delete spec;
 }
 
-int oiio_ImageSpec_width(ImageSpec &spec) {
+int oiio_ImageSpec__width(ImageSpec &spec) {
     return spec.width;
 }
 
-int oiio_ImageSpec_height(ImageSpec &spec) {
+int oiio_ImageSpec__height(ImageSpec &spec) {
     return spec.height;
 }
 
-int oiio_ImageSpec_nchannels(ImageSpec &spec) {
+int oiio_ImageSpec__nchannels(ImageSpec &spec) {
     return spec.nchannels;
 }
 
-ImageInput* oiio_ImageInput_open(char *path) {
+ImageInput* oiio_ImageInput___open(char *path) {
     auto in = ImageInput::open(path);
     return in ? in.release() : NULL;
 }
 
-void oiio_ImageInput_destroy(ImageInput *in) {
+void oiio_ImageInput___destroy(ImageInput *in) {
     delete in;
 }
 
@@ -50,12 +51,12 @@ bool oiio_ImageInput_close(ImageInput *in) {
     return in->close();
 }
 
-ImageOutput* oiio_ImageOutput_create(char *path) {
+ImageOutput* oiio_ImageOutput___create(char *path) {
     auto out = ImageOutput::create(path);
     return out ? out.release() : NULL;
 }
 
-void oiio_ImageOutput_destroy(ImageOutput *out) {
+void oiio_ImageOutput___destroy(ImageOutput *out) {
     delete out;
 }
 

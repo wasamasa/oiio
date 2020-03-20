@@ -12,5 +12,6 @@
   (import (chicken condition))
   (import (chicken foreign))
   (import (chicken gc))
+  (import bind coops cplusplus-object)
 
   (include "oiio-impl.scm"))

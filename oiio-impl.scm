@@ -1,4 +1,9 @@
-#> #include "oiio.h" <#
+#> #include <OpenImageIO/imageio.h> <#
+#> OIIO_NAMESPACE_USING <#
+(bind-rename/pattern "oiio_(([A-Z][a-z]*)+)___" "\\1::")
+(bind-rename/pattern "oiio_(([A-Z][a-z]*)+)__" "\\1.")
+(bind-rename/pattern "oiio_(([A-Z][a-z]*)+)_" "\\1->")
+(bind-file* "oiio-glue.h")
 
 ;;; enums
 
@@ -24,56 +29,11 @@
     ((float) TypeDesc::FLOAT)
     ((double) TypeDesc::DOUBLE)))
 
-;;; typedefs
-
-(define-foreign-type nullable-ImageInput* (c-pointer (struct "ImageInput")))
-(define-foreign-type ImageInput* (nonnull-c-pointer (struct "ImageInput")))
-(define-foreign-type nullable-ImageOutput* (c-pointer (struct "ImageOutput")))
-(define-foreign-type ImageOutput* (nonnull-c-pointer (struct "ImageOutput")))
-(define-foreign-type ImageSpec& (instance-ref "ImageSpec" 'imagespec))
-(define-foreign-type ImageSpec (instance "ImageSpec" 'imagespec))
-
 ;;; auxiliary records
 
 (define-record imageinput pointer)
 (define-record imageoutput pointer)
 (define-record imagespec pointer)
-
-;;; class helpers
-
-(define (make type _slot pointer)
-  (case type
-    ((imagespec) (make-imagespec pointer))
-    (else (error "Unknown C++ type"))))
-
-(define (slot-ref thing _slot)
-  (cond
-   ((imagespec? thing) (imagespec-pointer thing))
-   (else (error "Unknown C++ type"))))
-
-;;; foreign functions
-
-(define openimageio_version (foreign-lambda int "openimageio_version"))
-(define geterror (foreign-lambda c-string* "oiio_geterror"))
-(define ImageSpec::create (foreign-lambda ImageSpec "oiio_ImageSpec_create" int int int int))
-(define ImageSpec::destroy (foreign-lambda void "oiio_ImageSpec_destroy" ImageSpec))
-(define ImageSpec.width (foreign-lambda int "oiio_ImageSpec_width" ImageSpec&))
-(define ImageSpec.height (foreign-lambda int "oiio_ImageSpec_height" ImageSpec&))
-(define ImageSpec.nchannels (foreign-lambda int "oiio_ImageSpec_nchannels" ImageSpec&))
-
-(define ImageInput::open (foreign-lambda nullable-ImageInput* "oiio_ImageInput_open" c-string))
-(define ImageInput::destroy (foreign-lambda void "oiio_ImageInput_destroy" ImageInput*))
-(define ImageInput->spec (foreign-lambda ImageSpec& "oiio_ImageInput_spec" ImageInput*))
-(define ImageInput->geterror (foreign-lambda c-string* "oiio_ImageInput_geterror" ImageInput*))
-(define ImageInput->read_image (foreign-lambda bool "oiio_ImageInput_read_image" ImageInput* int blob))
-(define ImageInput->close (foreign-lambda bool "oiio_ImageInput_close" ImageInput*))
-
-(define ImageOutput::create (foreign-lambda nullable-ImageOutput* "oiio_ImageOutput_create" nonnull-c-string))
-(define ImageOutput::destroy (foreign-lambda void "oiio_ImageOutput_destroy" ImageOutput*))
-(define ImageOutput->geterror (foreign-lambda c-string* "oiio_ImageOutput_geterror" ImageOutput*))
-(define ImageOutput->open (foreign-lambda bool "oiio_ImageOutput_open" ImageOutput* c-string ImageSpec&))
-(define ImageOutput->write_image (foreign-lambda bool "oiio_ImageOutput_write_image" ImageOutput* int blob))
-(define ImageOutput->close (foreign-lambda bool "oiio_ImageOutput_close" ImageOutput*))
 
 ;;; errors
 
@@ -89,7 +49,7 @@
   (let ((imageinput* (ImageInput::open filename)))
     (if imageinput*
         (set-finalizer! (make-imageinput imageinput*) imageinput-destroy)
-        (abort (oiio-error (geterror) 'imageinput-open)))))
+        (abort (oiio-error (oiio_geterror) 'imageinput-open)))))
 
 (define (imageinput-destroy imageinput)
   (and-let* ((imageinput* (imageinput-pointer imageinput)))
@@ -117,7 +77,7 @@
   (let ((imageoutput* (ImageOutput::create filename)))
     (if imageoutput*
         (set-finalizer! (make-imageoutput imageoutput*) imageoutput-destroy)
-        (abort (oiio-error (geterror) 'imageoutput-create)))))
+        (abort (oiio-error (oiio_geterror) 'imageoutput-create)))))
 
 (define (imageoutput-destroy imageoutput)
   (and-let* ((imageoutput* (imageoutput-pointer imageoutput)))
@@ -167,4 +127,4 @@
     (ImageSpec.nchannels imagespec)))
 
 (define (openimageio-version)
-  (openimageio_version))
+  (oiio_version))
