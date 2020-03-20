@@ -9,4 +9,4 @@
                                      "-C" "-Wno-write-strings"
                                      "-C" "-std=c++11"
                                      "-L" "-lOpenImageIO")
-                        (source-dependencies "oiio-impl.scm" "oiio.h"))))
+                        (source-dependencies "oiio-impl.scm" "oiio-glue.h"))))
