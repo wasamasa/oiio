@@ -59,7 +59,7 @@
 
 (define (imageinput-spec imageinput)
   (and-let* ((imageinput* (imageinput-pointer imageinput)))
-    (ImageInput->spec imageinput*)))
+    (make-imagespec (ImageInput->spec imageinput*))))
 
 (define (imageinput-read-image imageinput basetype pixels)
   (when (not (blob? pixels))
@@ -89,8 +89,8 @@
 
 (define (imageoutput-open imageoutput filename imagespec)
   (and-let* ((imageoutput* (imageoutput-pointer imageoutput))
-             ((imagespec-pointer imagespec)))
-    (when (not (ImageOutput->open imageoutput* filename imagespec))
+             (imagespec* (imagespec-pointer imagespec)))
+    (when (not (ImageOutput->open imageoutput* filename imagespec*))
       (abort (oiio-error (ImageOutput->geterror imageoutput*)
                          'imageoutput-open)))))
 
@@ -110,26 +110,26 @@
                          'imageoutput-close)))))
 
 (define (imagespec-create width height channels basetype)
-  (let ((flag (typedesc-basetype->int basetype)))
-    (set-finalizer! (ImageSpec::create width height channels flag)
-                    imagespec-destroy)))
+  (let* ((flag (typedesc-basetype->int basetype))
+         (imagespec* (ImageSpec::create width height channels flag)))
+    (set-finalizer! (make-imagespec imagespec*) imagespec-destroy)))
 
 (define (imagespec-destroy imagespec)
-  (when (imagespec-pointer imagespec)
-    (ImageSpec::destroy imagespec)
+  (and-let* ((imagespec* (imagespec-pointer imagespec)))
+    (ImageSpec::destroy imagespec*)
     (imagespec-pointer-set! imagespec #f)))
 
 (define (imagespec-width imagespec)
-  (when (imagespec-pointer imagespec)
-    (ImageSpec.width imagespec)))
+  (and-let* ((imagespec* (imagespec-pointer imagespec)))
+    (ImageSpec.width imagespec*)))
 
 (define (imagespec-height imagespec)
-  (when (imagespec-pointer imagespec)
-    (ImageSpec.height imagespec)))
+  (and-let* ((imagespec* (imagespec-pointer imagespec)))
+    (ImageSpec.height imagespec*)))
 
 (define (imagespec-nchannels imagespec)
-  (when (imagespec-pointer imagespec)
-    (ImageSpec.nchannels imagespec)))
+  (and-let* ((imagespec* (imagespec-pointer imagespec)))
+    (ImageSpec.nchannels imagespec*)))
 
 (define (openimageio-version)
   (oiio_version))
