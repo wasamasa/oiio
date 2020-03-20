@@ -1,0 +1,8 @@
+((synopsis "oiio examples")
+ (author "Vasilij Schneidermann")
+ (license "BSD-3")
+ (dependencies srfi-18 epoxy gl-utils glfw3 oiio)
+ (component-options (csc-options "-m" "example"))
+ (components (program gl-test)
+             (program read)
+             (program write)))
