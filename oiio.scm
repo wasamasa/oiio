@@ -9,8 +9,10 @@
 
   (import scheme)
   (import (chicken base))
+  (import (chicken blob))
   (import (chicken condition))
   (import (chicken foreign))
+  (import (chicken format))
   (import (chicken gc))
   (import bind coops cplusplus-object)
 

@@ -37,8 +37,9 @@
 
 ;;; errors
 
-(define (type-error message location)
-  (condition `(exn location ,location message ,message) '(type)))
+(define (type-error value expected location)
+  (let ((message (format "Bad argument type - not a ~a: ~a" expected value)))
+    (condition `(exn location ,location message ,message) '(type))))
 
 (define (oiio-error message location)
   (condition `(exn location ,location message ,message) '(oiio)))
@@ -61,6 +62,8 @@
     (ImageInput->spec imageinput*)))
 
 (define (imageinput-read-image imageinput basetype pixels)
+  (when (not (blob? pixels))
+    (type-error pixels "blob" 'imageinput-read-image))
   (and-let* ((imageinput* (imageinput-pointer imageinput)))
     (let ((flag (typedesc-basetype->int basetype)))
       (when (not (ImageInput->read_image imageinput* flag pixels))
@@ -92,6 +95,8 @@
                          'imageoutput-open)))))
 
 (define (imageoutput-write-image imageoutput basetype pixels)
+  (when (not (blob? pixels))
+    (type-error pixels "blob" 'imageinput-write-image))
   (and-let* ((imageoutput* (imageoutput-pointer imageoutput)))
     (let ((flag (typedesc-basetype->int basetype)))
       (when (not (ImageOutput->write_image imageoutput* flag pixels))

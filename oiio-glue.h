@@ -43,8 +43,8 @@ char* oiio_ImageInput_geterror(ImageInput *in) {
     return strdup(in->geterror().c_str());
 }
 
-bool oiio_ImageInput_read_image(ImageInput *in, int type, void *pixels) {
-    return in->read_image(TypeDesc::BASETYPE(type), pixels);
+bool oiio_ImageInput_read_image(ImageInput *in, int type, C_word blob) {
+    return in->read_image(TypeDesc::BASETYPE(type), C_c_bytevector(blob));
 }
 
 bool oiio_ImageInput_close(ImageInput *in) {
@@ -68,8 +68,8 @@ bool oiio_ImageOutput_open(ImageOutput *out, char *filename, ImageSpec &spec) {
     return out->open(filename, spec);
 }
 
-bool oiio_ImageOutput_write_image(ImageOutput *out, int type, void *pixels) {
-    return out->write_image(TypeDesc::BASETYPE(type), pixels);
+bool oiio_ImageOutput_write_image(ImageOutput *out, int type, C_word blob) {
+    return out->write_image(TypeDesc::BASETYPE(type), C_c_bytevector(blob));
 }
 
 bool oiio_ImageOutput_close(ImageOutput *out) {
