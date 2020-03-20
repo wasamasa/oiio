@@ -1,9 +1,4 @@
-;;; headers
-
-#>
-#include <OpenImageIO/imageio.h>
-OIIO_NAMESPACE_USING
-<#
+#> #include "oiio.h" <#
 
 ;;; enums
 
@@ -58,40 +53,35 @@ OIIO_NAMESPACE_USING
 
 ;;; foreign functions
 
-;; TODO: use const where appropriate
-
 (define openimageio_version (foreign-lambda int "openimageio_version"))
-(define geterror (foreign-lambda* c-string* () "C_return(strdup(geterror().c_str()));"))
-(define ImageSpec::create (foreign-lambda* ImageSpec ((int width) (int height) (int channels) (int type)) "C_return(new ImageSpec(width, height, channels, TypeDesc::BASETYPE(type)));"))
-(define ImageSpec::destroy (foreign-lambda* void ((ImageSpec imagespec)) "delete imagespec;"))
-(define ImageInput::open (foreign-lambda nullable-ImageInput* "ImageInput::open" c-string))
-(define ImageInput::destroy (foreign-lambda void "ImageInput::destroy" ImageInput*))
-(define ImageInput->spec (foreign-lambda* ImageSpec& ((ImageInput* in)) "C_return(in->spec());"))
-(define ImageInput->geterror (foreign-lambda* c-string* ((ImageInput* in)) "C_return(strdup(in->geterror().c_str()));"))
-(define ImageInput->read_image (foreign-lambda* bool ((ImageInput* in) (int type) (blob pixels)) "C_return(in->read_image(TypeDesc::BASETYPE(type), pixels));"))
-(define ImageInput->close (foreign-lambda* bool ((ImageInput* in)) "C_return(in->close());"))
-(define ImageOutput::create (foreign-lambda nullable-ImageOutput* "ImageOutput::create" nonnull-c-string))
-(define ImageOutput::destroy (foreign-lambda void "ImageOutput::destroy" ImageOutput*))
-(define ImageOutput->geterror (foreign-lambda* c-string* ((ImageOutput* out)) "C_return(strdup(out->geterror().c_str()));"))
-(define ImageOutput->open (foreign-lambda* bool ((ImageOutput* out) (nonnull-c-string filename) (ImageSpec& spec)) "C_return(out->open(filename, spec));"))
-(define ImageOutput->write_image (foreign-lambda* bool ((ImageOutput* out) (int type) (blob pixels)) "C_return(out->write_image(TypeDesc::BASETYPE(type), pixels));"))
-(define ImageOutput->close (foreign-lambda* bool ((ImageOutput* out)) "C_return(out->close());"))
-(define ImageSpec.width (foreign-lambda* int ((ImageSpec& spec)) "C_return(spec.width);"))
-(define ImageSpec.height (foreign-lambda* int ((ImageSpec& spec)) "C_return(spec.height);"))
-(define ImageSpec.nchannels (foreign-lambda* int ((ImageSpec& spec)) "C_return(spec.nchannels);"))
+(define geterror (foreign-lambda c-string* "oiio_geterror"))
+(define ImageSpec::create (foreign-lambda ImageSpec "oiio_ImageSpec_create" int int int int))
+(define ImageSpec::destroy (foreign-lambda void "oiio_ImageSpec_destroy" ImageSpec))
+(define ImageSpec.width (foreign-lambda int "oiio_ImageSpec_width" ImageSpec&))
+(define ImageSpec.height (foreign-lambda int "oiio_ImageSpec_height" ImageSpec&))
+(define ImageSpec.nchannels (foreign-lambda int "oiio_ImageSpec_nchannels" ImageSpec&))
+
+(define ImageInput::open (foreign-lambda nullable-ImageInput* "oiio_ImageInput_open" c-string))
+(define ImageInput::destroy (foreign-lambda void "oiio_ImageInput_destroy" ImageInput*))
+(define ImageInput->spec (foreign-lambda ImageSpec& "oiio_ImageInput_spec" ImageInput*))
+(define ImageInput->geterror (foreign-lambda c-string* "oiio_ImageInput_geterror" ImageInput*))
+(define ImageInput->read_image (foreign-lambda bool "oiio_ImageInput_read_image" ImageInput* int blob))
+(define ImageInput->close (foreign-lambda bool "oiio_ImageInput_close" ImageInput*))
+
+(define ImageOutput::create (foreign-lambda nullable-ImageOutput* "oiio_ImageOutput_create" nonnull-c-string))
+(define ImageOutput::destroy (foreign-lambda void "oiio_ImageOutput_destroy" ImageOutput*))
+(define ImageOutput->geterror (foreign-lambda c-string* "oiio_ImageOutput_geterror" ImageOutput*))
+(define ImageOutput->open (foreign-lambda bool "oiio_ImageOutput_open" ImageOutput* c-string ImageSpec&))
+(define ImageOutput->write_image (foreign-lambda bool "oiio_ImageOutput_write_image" ImageOutput* int blob))
+(define ImageOutput->close (foreign-lambda bool "oiio_ImageOutput_close" ImageOutput*))
 
 ;;; errors
 
-(define (define-error location message #!rest condition)
-  (let ((base (make-property-condition 'exn 'location location 'message message))
-        (extra (apply make-property-condition condition)))
-    (make-composite-condition base extra)))
-
 (define (type-error message location)
-  (define-error location message 'type))
+  (condition `(exn location ,location message ,message) '(type)))
 
 (define (oiio-error message location)
-  (define-error location message 'oiio))
+  (condition `(exn location ,location message ,message) '(oiio)))
 
 ;;; API
 

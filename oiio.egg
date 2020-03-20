@@ -2,10 +2,10 @@
  (author "Vasilij Schneidermann")
  (license "BSD-3")
  (category graphics)
- (foreign-dependencies "OpenImageIO")
+ (foreign-dependencies "OpenImageIO>=2.0")
  (components (extension oiio
                         (csc-options "-O3" "-d1" "-c++"
                                      "-C" "-Wno-write-strings"
                                      "-C" "-std=c++11"
                                      "-L" "-lOpenImageIO")
-                        (source-dependencies "oiio-impl.scm"))))
+                        (source-dependencies "oiio-impl.scm" "oiio.h"))))
